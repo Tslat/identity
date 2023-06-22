@@ -12,13 +12,11 @@ import draylar.identity.screen.widget.HelpWidget;
 import draylar.identity.screen.widget.PlayerWidget;
 import draylar.identity.screen.widget.SearchWidget;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Selectable;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.MutableText;
@@ -104,15 +102,15 @@ public class IdentityScreen extends Screen {
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-        renderBackground(matrices);
+    public void render(DrawContext drawContext, int mouseX, int mouseY, float delta) {
+        renderBackground(drawContext);
 
         // Render background hint when no identities have been collected
         if(unlocked.isEmpty()) {
             MutableText message = Text.translatable("identity.menu_hint");
-            float xPosition = (getWindow().getWidth() / 2f) - (MinecraftClient.getInstance().textRenderer.getWidth(message) / 2f);
-            float yPosition = (getWindow().getHeight() / 2f);
-            MinecraftClient.getInstance().textRenderer.draw(matrices, message, xPosition, yPosition, 0xFFFFFF);
+            int xPosition = (int)((getWindow().getWidth() / 2f) - (MinecraftClient.getInstance().textRenderer.getWidth(message) / 2f));
+            int yPosition = (int)(getWindow().getHeight() / 2f);
+            drawContext.drawText(MinecraftClient.getInstance().textRenderer, message.asOrderedText(), xPosition, yPosition, 0xFFFFFF, false);
         }
 
         // tooltips
@@ -125,17 +123,17 @@ public class IdentityScreen extends Screen {
 //            }
 //        }
 
-        searchBar.render(matrices, mouseX, mouseY, delta);
-        playerButton.render(matrices, mouseX, mouseY, delta);
-        helpButton.render(matrices, mouseX, mouseY, delta);
-        renderEntityWidgets(matrices, mouseX, mouseY, delta);
+        searchBar.render(drawContext, mouseX, mouseY, delta);
+        playerButton.render(drawContext, mouseX, mouseY, delta);
+        helpButton.render(drawContext, mouseX, mouseY, delta);
+        renderEntityWidgets(drawContext, mouseX, mouseY, delta);
     }
 
-    public void renderEntityWidgets(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void renderEntityWidgets(DrawContext drawContext, int mouseX, int mouseY, float delta) {
         double scaledFactor = this.client.getWindow().getScaleFactor();
         int top = 35;
 
-        matrices.push();
+        drawContext.getMatrices().push();
         RenderSystem.enableScissor(
                 (int) ((double) 0 * scaledFactor),
                 (int) ((double) 0 * scaledFactor),
@@ -143,12 +141,12 @@ public class IdentityScreen extends Screen {
                 (int) ((double) (this.height - top) * scaledFactor));
 
         entityWidgets.forEach(widget -> {
-            widget.render(matrices, mouseX, mouseY, delta);
+            widget.render(drawContext, mouseX, mouseY, delta);
         });
 
         RenderSystem.disableScissor();
 
-        matrices.pop();
+        drawContext.getMatrices().pop();
     }
 
     @Override

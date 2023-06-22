@@ -7,6 +7,7 @@ import draylar.identity.api.model.EntityUpdater;
 import draylar.identity.api.model.EntityUpdaters;
 import draylar.identity.api.platform.IdentityConfig;
 import draylar.identity.mixin.accessor.EntityAccessor;
+import draylar.identity.mixin.accessor.LimbAnimatorAccessor;
 import draylar.identity.mixin.accessor.LivingEntityAccessor;
 import draylar.identity.mixin.accessor.LivingEntityRendererAccessor;
 import net.minecraft.client.MinecraftClient;
@@ -59,9 +60,11 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
 
         // sync player data to identity identity
         if(identity != null) {
-            identity.lastLimbDistance = player.lastLimbDistance;
-            identity.limbDistance = player.limbDistance;
-            identity.limbAngle = player.limbAngle;
+            LimbAnimatorAccessor limbAnimator = (LimbAnimatorAccessor)identity.limbAnimator;
+
+            limbAnimator.setPos(player.limbAnimator.getPos());
+            limbAnimator.setPrevSpeed(((LimbAnimatorAccessor)player.limbAnimator).getPrevSpeed());
+            identity.limbAnimator.setSpeed(player.limbAnimator.getSpeed());
             identity.handSwinging = player.handSwinging;
             identity.handSwingTicks = player.handSwingTicks;
             identity.lastHandSwingProgress = player.lastHandSwingProgress;
@@ -72,11 +75,12 @@ public abstract class PlayerEntityRendererMixin extends LivingEntityRenderer<Abs
             identity.prevHeadYaw = player.prevHeadYaw;
             identity.age = player.age;
             identity.preferredHand = player.preferredHand;
+            identity.hurtTime = player.hurtTime;
             identity.setOnGround(player.isOnGround());
             identity.setVelocity(player.getVelocity());
 
-            ((EntityAccessor) identity).setVehicle(player.getVehicle());
-            ((EntityAccessor) identity).setTouchingWater(player.isTouchingWater());
+            ((EntityAccessor)identity).setVehicle(player.getVehicle());
+            ((EntityAccessor)identity).setTouchingWater(player.isTouchingWater());
 
             // phantoms' pitch is inverse for whatever reason
             if(identity instanceof PhantomEntity) {

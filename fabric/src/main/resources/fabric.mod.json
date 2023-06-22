@@ -28,8 +28,8 @@
     "identity-fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.8.7+build.201",
-    "fabric": "*",
-    "architectury": "*"
+    "fabricloader": ">=0.14",
+    "fabric": ">=0.84",
+    "architectury": ">=9.0"
   }
 }

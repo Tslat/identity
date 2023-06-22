@@ -1,7 +1,6 @@
 package draylar.identity.mixin.player;
 
 import draylar.identity.api.PlayerFavorites;
-import draylar.identity.api.PlayerHostility;
 import draylar.identity.api.PlayerIdentity;
 import draylar.identity.api.PlayerUnlocks;
 import net.minecraft.server.PlayerManager;

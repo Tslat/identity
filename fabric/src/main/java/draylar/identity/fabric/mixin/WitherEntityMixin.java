@@ -28,7 +28,7 @@ public abstract class WitherEntityMixin extends HostileEntity {
             at = @At(value = "INVOKE", target = "Ljava/util/List;isEmpty()Z"),
             locals = LocalCapture.CAPTURE_FAILHARD
     )
-    private void removeInvalidPlayerTargets(CallbackInfo ci, int j, List<LivingEntity> list) {
+    private void removeInvalidPlayerTargets(CallbackInfo ci, int i, int j, List<LivingEntity> list) {
         List<LivingEntity> toRemove = new ArrayList<>();
 
         list.forEach(entity -> {
@@ -39,11 +39,11 @@ public abstract class WitherEntityMixin extends HostileEntity {
                 if(identity != null && identity.isUndead()) {
                     if(this.getTarget() != null) {
                         // if this wither's target is not equal to the current entity
-                        if(!this.getTarget().getUuid().equals(entity.getUuid())) {
-                            toRemove.add(entity);
+                        if(!this.getTarget().getUuid().equals(player.getUuid())) {
+                            toRemove.add(player);
                         }
                     } else {
-                        toRemove.add(entity);
+                        toRemove.add(player);
                     }
                 }
             }

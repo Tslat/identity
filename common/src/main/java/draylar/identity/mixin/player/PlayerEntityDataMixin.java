@@ -2,9 +2,9 @@ package draylar.identity.mixin.player;
 
 import dev.architectury.event.EventResult;
 import draylar.identity.Identity;
+import draylar.identity.api.FlightHelper;
 import draylar.identity.api.PlayerIdentity;
 import draylar.identity.api.event.IdentitySwapCallback;
-import draylar.identity.api.FlightHelper;
 import draylar.identity.api.platform.IdentityConfig;
 import draylar.identity.api.variant.IdentityType;
 import draylar.identity.impl.DimensionsRefresher;
@@ -23,7 +23,6 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
@@ -35,7 +34,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityDataMixin extends LivingEntity implements PlayerDataProvider {
@@ -178,7 +179,7 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
             // ensure entity data exists
             if(entityTag != null) {
                 if(identity == null || !type.get().equals(identity.getType())) {
-                    identity = (LivingEntity) type.get().create(world);
+                    identity = (LivingEntity) type.get().create(getWorld());
 
                     // refresh player dimensions/hitbox on client
                     ((DimensionsRefresher) this).identity_refreshDimensions();
@@ -303,13 +304,12 @@ public abstract class PlayerEntityDataMixin extends LivingEntity implements Play
         }
 
         // sync with client
-        if(!player.world.isClient) {
-            PlayerIdentity.sync((ServerPlayerEntity) player);
+        if(player instanceof ServerPlayerEntity serverPlayer) {
+            PlayerIdentity.sync(serverPlayer);
 
-            Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor) ((ServerWorld) player.world).getChunkManager().threadedAnvilChunkStorage).getEntityTrackers();
-            Object tracking = trackers.get(player.getId());
-            ((EntityTrackerAccessor) tracking).getListeners().forEach(listener -> {
-                PlayerIdentity.sync((ServerPlayerEntity) player, listener.getPlayer());
+            Int2ObjectMap<Object> trackers = ((ThreadedAnvilChunkStorageAccessor)serverPlayer.getServerWorld().getChunkManager().threadedAnvilChunkStorage).getEntityTrackers();
+            ((EntityTrackerAccessor) trackers.get(serverPlayer.getId())).getListeners().forEach(listener -> {
+                PlayerIdentity.sync(serverPlayer, listener.getPlayer());
             });
         }
 

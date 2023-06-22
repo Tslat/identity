@@ -34,6 +34,7 @@
     "accessor.CreeperEntityAccessor",
     "accessor.EntityAccessor",
     "accessor.IronGolemEntityAccessor",
+    "accessor.LimbAnimatorAccessor",
     "accessor.LivingEntityAccessor",
     "accessor.MobEntityAccessor",
     "accessor.ParrotEntityAccessor",
